@@ -1,0 +1,44 @@
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+<meta content="{{ color }}" name="theme-color" />
+<meta property="og:site_name" content="{{ appname }}">
+
+
+<meta property="og:url" content="{{ videoInfo.original_url }}" />\
+<meta property="og:site_name" content="Uhhhh">
+
+{{#video}}
+
+    <meta name="twitter:card" content="player" />
+    <meta name="twitter:title" content="{{ videoInfo.creator }}" />
+    <meta name="twitter:player:width" content="{{ vFormat.width }}" />
+    <meta name="twitter:player:height" content="{{ vFormat.height }}" />
+    <meta name="twitter:player:stream" content="{{ mp4URL }}" />
+    <meta name="twitter:player:stream:content_type" content="video/mp4" />
+
+    <meta property="og:video" content="{{ mp4URL }}" />
+    <meta property="og:video:secure_url" content="{{ mp4URL }}" />
+    <meta property="og:video:type" content="video/mp4" />
+    <meta property="og:video:width" content="{{ vFormat.width }}" />
+    <meta property="og:video:height" content="{{ vFormat.height }}" />
+
+{{/video}}
+
+{{#photo}}
+
+    <meta name="twitter:title" content="{{ videoInfo.creator }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="twitter:image" content="{{ mp4URL }}"/>
+    <meta property="twitter:image:width" content="{{ vFormat.width }}"/>
+    <meta property="twitter:image:height" content="{{ vFormat.height }}"/>
+
+    <meta property="og:image" content="{{ videoInfo.thumbnail }}" />
+    <meta property="og:image:secure_url" content="{{ videoInfo.thumbnail }}" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="{{ vFormat.width }}" />
+    <meta property="og:image:height" content="{{ vFormat.height }}" />
+{{/photo}}
+
+<link rel="alternate" href="{{ oembedURL }}" type="application/json+oembed" title="{{ videoInfo.creator }}">
+
+<meta http-equiv="refresh" content="0; url = {{ videoInfo.original_url }}" />
+You are being redirected. If you aren't redirected, <a href="{{ videoInfo.original_url }}">click here.</a>
