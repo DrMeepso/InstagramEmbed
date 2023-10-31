@@ -15,7 +15,23 @@ const igInfo = {} as igInfo;
 
 (async () => {
 
-    const session_id = await getCookie(Username, Password);
+    let session_id = ""
+
+    // check if login file exists
+    if (!await fs.stat("./cookieStore.txt").catch(() => false)) {
+
+        console.log("New Session ID!")
+
+        session_id = String(await getCookie(Username, Password))
+        await fs.writeFile("./cookieStore.txt", String(session_id))
+
+    } else {
+        session_id = await fs.readFile("./cookieStore.txt", "utf-8")
+
+        console.log("Session ID from file!")
+    }
+
+    //session_id = await getCookie(Username, Password);
     if (!session_id) throw new Error("Invalid session id");
     if (typeof session_id !== "string") throw new Error("Invalid session id");
     let ig: igApi = new igApi(session_id, false);
@@ -70,8 +86,9 @@ async function Embed(req: any, res: any) {
 
     let id = req.params.id;
     let offset = req.params.offset != undefined ? parseInt(req.params.offset) : 0;
+    let any = req.params.any 
 
-    let html = await getVideoHTML(id, offset)
+    let html = await getVideoHTML(id, offset, any)
 
     res.send(html)
 
@@ -95,17 +112,33 @@ app.get("/uwu/:id/:offset", async (req, res) => {
 
 })
 
+const cachedVideos = new Map<string, IPostModels>()
+
 async function getVideoInfo(id: string, offset: number = 0) {
     
+    if (cachedVideos.has(id)) {
+
+        console.log("Cached Video!")
+
+        return {
+            videoInfoInsta: cachedVideos.get(id)!,
+            video: cachedVideos.get(id)!.links[offset]
+        }
+    }
+
     try {
 
         let videoInfoInsta: IPostModels = await getVideo(`https://www.instagram.com/p/${id}/`)
-        offset = offset != undefined && offset <= videoInfoInsta.links.length-1 ? 0 : offset
+        offset = offset != undefined && offset <= videoInfoInsta.links.length && offset !< 1 ? 0 : offset + 1
         let video = videoInfoInsta.links[offset]
 
         if (video == undefined) {
             throw new Error("Invalid offset, or video does not exist!")
         }
+
+        cachedVideos.set(id, videoInfoInsta)
+
+        console.log("New Video!")
 
         return {
             videoInfoInsta,
@@ -118,7 +151,7 @@ async function getVideoInfo(id: string, offset: number = 0) {
 
 }
 
-async function getVideoHTML(id: string, offset: number = 0) {
+async function getVideoHTML(id: string, offset: number = 0, any: string = "") {
 
     var videoInfoInsta, video
 
@@ -134,7 +167,7 @@ async function getVideoHTML(id: string, offset: number = 0) {
 
         videoInfo: {
             creator: videoInfoInsta.username,
-            original_url: `https://www.instagram.com/p/${id}/`,
+            original_url: any == "d" ? video.url : `https://www.instagram.com/p/${id}/`,
             description: videoInfoInsta.caption
         },
 
@@ -166,11 +199,9 @@ async function getVideoUWU(id: string, offset: number = 0) {
 
     let { videoInfoInsta, video } = await getVideoInfo(id, offset)
 
-    console.log(videoInfoInsta)
-
     // first 20 characters of the caption
     let description = videoInfoInsta.caption!.substring(0, 50) + (videoInfoInsta.caption!.length > 50 ? "..." : "")
-    let StatsLine = `❤️ ${videoInfoInsta.likes} \n💬 ${videoInfoInsta.comment_count} \n${description}`
+    let StatsLine = `❤️ ${videoInfoInsta.likes} 💬 ${videoInfoInsta.comment_count} \n${description}`
 
     let data = JSON.stringify({
 
@@ -187,8 +218,6 @@ async function getVideoUWU(id: string, offset: number = 0) {
 
     })
 
-
-    console.log(data)
     return data
 
 }
