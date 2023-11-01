@@ -4,7 +4,7 @@ import mustache from "mustache"
 import fs from "fs/promises"
 import cors from "cors"
 
-import { Username, Password, DeploymetURL } from './login.json'
+import { Username, Password, DeploymetURL, Port } from './login.json'
 import { IPostModels } from 'insta-fetcher/dist/types';
 
 interface igInfo {
@@ -222,6 +222,6 @@ async function getVideoUWU(id: string, offset: number = 0) {
 
 }
 
-app.listen(3000, () => {
-    console.log("Listening on port 3000!")
+app.listen(Port, () => {
+    console.log("Listening on port " + Port)
 })
