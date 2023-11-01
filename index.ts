@@ -73,9 +73,9 @@ app.get("/", async (req, res) => {
 
 })
 
-app.get("/p/:id/:offset/:any", async (req, res) => {Embed(req, res)})
-app.get("/p/:id/:offset", async (req, res) => {Embed(req, res)})
-app.get("/p/:id", async (req, res) => {Embed(req, res)})
+app.get("/*/:id/:offset/:any", async (req, res) => {Embed(req, res)})
+app.get("/*/:id/:offset", async (req, res) => {Embed(req, res)})
+app.get("/*/:id", async (req, res) => {Embed(req, res)})
 
 async function Embed(req: any, res: any) {
 
