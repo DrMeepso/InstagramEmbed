@@ -6,6 +6,7 @@ import cors from "cors"
 
 import { Username, Password, DeploymetURL, Port } from './login.json'
 import { IPostModels } from 'insta-fetcher/dist/types';
+import { off } from 'superagent';
 
 interface igInfo {
     ig: igApi
@@ -73,44 +74,40 @@ app.get("/", async (req, res) => {
 
 })
 
-app.get("/*/:id/:offset/:any", async (req, res) => {Embed(req, res)})
-app.get("/*/:id/:offset", async (req, res) => {Embed(req, res)})
-app.get("/*/:id", async (req, res) => {Embed(req, res)})
+app.get("/:type/:id/:offset/:any", async (req, res) => {Embed(req, res)})
+app.get("/:type/:id/:offset", async (req, res) => {Embed(req, res)})
+app.get("/:type/:id", async (req, res) => {Embed(req, res)})
 
 async function Embed(req: any, res: any) {
 
-    if (igInfo.ig == undefined) {
-        res.send("Not logged in!")
-        return;
-    }
+    let type = req.params.type;
 
     let id = req.params.id;
     let offset = req.params.offset != undefined ? parseInt(req.params.offset) : 0;
     let any = req.params.any 
 
-    let html = await getVideoHTML(id, offset, any)
+    if (type != "uwu") {
 
-    res.send(html)
+        if (igInfo.ig == undefined) {
+            res.send("Not logged in!")
+            return;
+        }
+    
+        let html = await getVideoHTML(id, offset, any)
+    
+        res.send(html)
+
+    } else {
+
+        let data = await getVideoUWU(id, offset)
+
+        res.send(data)
+
+    }
 
 }
 
-app.get("/uwu/:id/:offset", async (req, res) => {
-
-
-    if (igInfo.ig == undefined) {
-        res.send("Not logged in!")
-        return;
-    }
-
-    let id = req.params.id;
-    let offset = parseInt(req.params.offset);
-
-    let data = await getVideoUWU(id, offset)
-
-    res.send(data)
-
-
-})
+//http://localhost:3080/uwu/CySHOL1s1WY/
 
 const cachedVideos = new Map<string, IPostModels>()
 
@@ -200,7 +197,7 @@ async function getVideoUWU(id: string, offset: number = 0) {
     let { videoInfoInsta, video } = await getVideoInfo(id, offset)
 
     // first 20 characters of the caption
-    let description = videoInfoInsta.caption!.substring(0, 50) + (videoInfoInsta.caption!.length > 50 ? "..." : "")
+    let description = videoInfoInsta.caption != null ? videoInfoInsta.caption!.substring(0, 50) + (videoInfoInsta.caption!.length > 50 ? "..." : "") : ""
     let StatsLine = `❤️ ${videoInfoInsta.likes} 💬 ${videoInfoInsta.comment_count} \n${description}`
 
     let data = JSON.stringify({
